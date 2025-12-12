@@ -130,6 +130,40 @@
   padding: var(--space-2) var(--space-3);
 }
 
+/* Modern, elegant scrollbars (WebKit/Chromium) */
+/* Global */
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  /* Subtle dark to match light theme accents */
+  background: linear-gradient(180deg, #77808f 0%, #6b7280 100%);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #6f7888 0%, #4b5563 100%);
+}
+
+/* Firefox */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #6b7280 transparent;
+}
+
+/* Modal-specific tweak for better contrast */
+.modal {
+  scrollbar-width: thin;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

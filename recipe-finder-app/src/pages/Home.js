@@ -3,7 +3,7 @@ import SearchBar from '../components/SearchBar';
 import RecipeCard from '../components/RecipeCard';
 import RecipeDetails from '../components/RecipeDetails';
 import Loader from '../components/Loader';
-import { searchRecipes } from '../api/recipeApi';
+import { searchRecipes, getRecipeById } from '../api/recipeApi';
 
 const FAVORITES_KEY = 'rf_favorites_v1';
 
@@ -44,6 +44,27 @@ const Home = () => {
         setPage(0);
     };
 
+    const onSelectRecipe = async (recipe) => {
+        // If we already have instructions or analyzed steps, open directly.
+        const hasSteps = Array.isArray(recipe.analyzedInstructions) && recipe.analyzedInstructions.length > 0;
+        if (hasSteps || recipe.instructions || recipe.summary) {
+            setSelected(recipe);
+            return;
+        }
+
+        // Otherwise, fetch full details to try to get instructions.
+        setLoading(true);
+        try {
+            const full = await getRecipeById(recipe.id);
+            setSelected(full);
+        } catch (err) {
+            // Fall back to showing the partial recipe if fetch fails
+            setSelected(recipe);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             const { query, mealType, diet } = queryParams;
@@ -51,7 +72,8 @@ const Home = () => {
             setLoading(true);
             setError('');
             try {
-                const { results, totalResults } = await searchRecipes({ query, mealType, diet, number: 20, offset: page * 20 });
+                const PAGE_SIZE = 21;
+                const { results, totalResults } = await searchRecipes({ query, mealType, diet, number: PAGE_SIZE, offset: page * PAGE_SIZE });
                 setRecipes(results);
                 setTotalResults(totalResults);
             } catch (err) {
@@ -64,7 +86,8 @@ const Home = () => {
     }, [queryParams, page]);
 
     const canPrev = page > 0;
-    const canNext = (page + 1) * 20 < totalResults;
+    const PAGE_SIZE = 21;
+    const canNext = (page + 1) * PAGE_SIZE < totalResults;
 
     const headerSummary = useMemo(() => {
         if (!queryParams.query) return 'Start by searching for recipes';
@@ -92,7 +115,7 @@ const Home = () => {
                             recipe={r}
                             isFavorite={isFavorite(r.id)}
                             onToggleFavorite={toggleFavorite}
-                            onClick={setSelected}
+                            onClick={onSelectRecipe}
                         />
                     ))}
                 </div>

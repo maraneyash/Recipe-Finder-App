@@ -13,6 +13,9 @@ const normalizeRecipe = (r) => ({
     calories: r.nutrition?.nutrients?.find?.((n) => n.name === 'Calories')?.amount,
     mealTypeLabel: Array.isArray(r.dishTypes) && r.dishTypes.length ? r.dishTypes[0] : undefined,
     instructions: r.instructions,
+    analyzedInstructions: r.analyzedInstructions,
+    summary: r.summary,
+    sourceUrl: r.sourceUrl,
     extendedIngredients: r.extendedIngredients,
     nutrition: r.nutrition,
 });
